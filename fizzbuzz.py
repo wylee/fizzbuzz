@@ -85,9 +85,25 @@ class RuleSet(object):
 
     """
 
-    def __init__(self):
+    def __init__(self, before_processing=None, after_processing=None):
+        """
+
+            ``before_processing``
+                A function that will be called before every value is
+                processed. It will be passed the value that is about to
+                be processed. Its purpose is to provide a place to do
+                anything that needs to happen before every value is
+                processed.
+
+            ``after_processing``
+                Like ``before_processing`` but called after every value
+                is processed.
+
+        """
         self._rules = []
         self._defaults = []
+        self.before_processing = before_processing
+        self.after_processing = after_processing
 
     def add(self, condition, action, last=False):
         """Add a rule.
@@ -121,6 +137,8 @@ class RuleSet(object):
     def process(self, x):
         """Test if ``x`` matches rule(s) and execute action(s) if so."""
         match_not_found = True
+        if self.before_processing:
+            self.before_processing(x)
         for rule in self._rules:
             if rule.matches(x):
                 rule.action(x)
@@ -130,6 +148,8 @@ class RuleSet(object):
         if match_not_found:
             for action in self._defaults:
                 action(x)
+        if self.after_processing:
+            self.after_processing()
 
     def process_many(self, xs):
         for x in xs:
