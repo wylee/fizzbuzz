@@ -181,12 +181,16 @@ def get_fizz_buzz_values():
 
     """
     output = []
-    rules = RuleSet()
-    rules.add(
-        lambda x: x % 15 == 0, lambda x: output.append('FizzBuzz'), last=True)
-    rules.add(lambda x: x % 3 == 0, lambda x: output.append('Fizz'))
-    rules.add(lambda x: x % 5 == 0, lambda x: output.append('Buzz'))
-    rules.add_default(lambda x: output.append(x))
+    rules = RuleSet(before_processing=lambda n: output.append(''))
+    def fizz(n):
+        output[-1] = 'Fizz'
+    def buzz(n):
+        output[-1] += 'Buzz'
+    def default(n):
+        output[-1] = n
+    rules.add(lambda x: x % 3 == 0, fizz)
+    rules.add(lambda x: x % 5 == 0, buzz, last=True)
+    rules.add_default(default)
     rules.process_many(range(1, 101))
     return output
 
