@@ -149,7 +149,7 @@ class RuleSet(object):
             for action in self._defaults:
                 action(x)
         if self.after_processing:
-            self.after_processing()
+            self.after_processing(x)
 
     def process_many(self, xs):
         for x in xs:
